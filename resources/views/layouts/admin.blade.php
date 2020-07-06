@@ -10,7 +10,7 @@
   <meta name="author" content="">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  <title>@yield('title')</title>
+  <title>@yield('title' , config('app.name'))</title>
 
   <!-- Custom fonts for this template-->
   <link href=" {{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
@@ -18,7 +18,8 @@
 
   <!-- Custom styles for this template-->
   <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
-
+  <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
+  @yield('css')
 </head>
 
 <body id="page-top">
@@ -65,7 +66,7 @@
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Learning plus catalog:</h6>
             <a class="collapse-item" href=" {{ route('admin.categories.index') }} ">Categories</a>
-            <a class="collapse-item" href="#">Courses</a>
+            <a class="collapse-item" href="{{ route('admin.courses.index') }}">Courses</a>
           </div>
         </div>
       </li>
@@ -329,6 +330,7 @@
   <!-- Custom scripts for all pages-->
 <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
 <script src="{{ asset('js/custom.js') }}"></script>
+@yield('js')
 
 </body>
 

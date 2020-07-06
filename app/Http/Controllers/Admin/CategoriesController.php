@@ -94,7 +94,8 @@ class CategoriesController extends Controller
     public function deleteAll(Request $request)
     {
         $ids = $request->ids;
-        DB::table("categories")->whereIn('id',explode(",",$ids))->delete();
+        $table = $request->table;
+        DB::table($table)->whereIn('id',explode(",",$ids))->delete();
         
         return response()->json(['success'=>"Products Deleted successfully."]);
     }

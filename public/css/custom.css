@@ -1,0 +1,109 @@
+h2, h3,h4{
+    font-weight: bold !important;
+    line-height: 1.5;
+}
+body{
+    color: #4e4e4e ;
+}
+.titles 
+{
+    background-color: #f9f9f9;
+    border: 1px solid #dedfe0;
+    padding: 10px 15px;
+}
+.titles h3{
+    font-size: 20px;
+    padding-top: 7px;
+}
+.description ,.course-video{
+    margin-top: 20px;
+    padding: 0 20px;
+}
+.description p{
+    line-height: 1.7;
+    padding-top: 5px;
+}
+.course-img img{
+    width: 100%;
+    border-radius: 2%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border: 2px solid #fff;
+}
+.course-sidbar{
+    padding: 20px 15px;
+}
+.course-info > div{
+    margin-bottom: 7px;
+}
+.course-info span{
+    padding-left: 10px;
+}
+.action{
+    margin-top: 20px;
+}
+.course-content{
+    background-color: #fff;
+    border-radius: 2px;
+    padding-top: 8px;
+}
+/* For read more read less */
+.morecontent span {
+    display: none;
+}
+.morelink {
+    display: block;
+}
+.item-row:hover .list-action{
+    display: inline-flex !important;
+}
+.list-action{
+    transition: all .6s ease-out;
+}
+.filter{
+    display: none;
+}
+.filter-row{
+    float: left;
+    width: 33.33%;
+}
+.section{
+    background-color: #eee;
+    min-height: 200px;
+    width: 450px;
+    padding: 15px 15px 30px;
+    margin: 20px;
+    border-radius: 2px;
+    position: relative;
+}
+.lecture{
+    border: 1px solid #c6c5c5;
+    padding: 10px;
+    position: relative;
+    margin-bottom: 15px;
+}
+.add-lecture{
+    position: absolute;
+    left: 12px;
+    bottom: 15px;
+    display: none;
+}
+.action-section, .action-lecture{
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    display: none;
+}
+.action-section i{
+    color: #797b7b;
+}
+.section:hover .action-section, .section:hover .add-lecture{
+    display: block;
+}
+.lecture:hover .action-lecture{
+    display: block;
+}
+.lecture-items{
+    padding: 0 20px 20px;
+    width: 100%;
+    display: none;
+}

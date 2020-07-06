@@ -15,11 +15,12 @@
   </div>
 </div>
 <div class="action">
-  <button class="btn btn-outline-primary btn-sm delete_all mb-2" data-url="{{ route('admin.categories.deleteAll')}}">Delete All Selected</button>
+  <input type="checkbox" id="master">
+  <a href="#" class="delete_all mb-2" data-table="categories" data-url="{{ route('admin.categories.deleteAll')}}">Delete</a>
 </div>
 <table class="table mt-3">
   <tr>
-    <th width="50px"><input type="checkbox" id="master"></th>
+    <th width="50px"></th>
     <th>No</th>
     <th>Name</th>
     <th>Parent Category</th> 

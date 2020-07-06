@@ -55,6 +55,18 @@ return [
             'visibility' => 'public',
         ],
 
+        'images' => [
+            'driver' => 'local',
+            'root' => public_path('images'),
+            'visibility' => 'public',
+        ],
+
+        'videos' => [
+            'driver' => 'local',
+            'root' => public_path('videos'),
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
