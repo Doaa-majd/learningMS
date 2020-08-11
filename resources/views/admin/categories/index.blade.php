@@ -11,7 +11,7 @@
 <div class="d-flex">
   <h2 class="h3 mb-4 text-gray-800">All Categories</h2>
   <div class="ml-auto">
-    <a href="{{ route('admin.categories.create')}}" class="btn btn-outline-primary btn-sm">Create New Category</a>
+    <a href="{{ route('admin.categories.create')}}" class="btn btn-outline-info btn-sm">Create New Category</a>
   </div>
 </div>
 <div class="action">

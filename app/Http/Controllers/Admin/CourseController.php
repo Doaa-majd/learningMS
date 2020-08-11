@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Course;
 use App\Lecture;
 use App\Section;
+use App\CourseUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 
@@ -19,9 +22,21 @@ class CourseController extends Controller
      */
     public function index()
     {
-        $courses = Course::join('categories', 'categories.id', '=', 'courses.category_id')
+        $this->authorize('viewAny',Course::class);
+        $courses = [];
+        if(Auth::user()->type == 'admin'){
+         $courses = Course::join('categories', 'categories.id', '=', 'courses.category_id')
             ->select('courses.*', 'categories.name as category_name','categories.id as category_id')
             ->paginate(3);
+        }
+
+        if(Auth::user()->type == 'instructor'){
+          $courses = Course::with('category')->whereHas('courseUsers', function($q)
+            {
+                $q->where('user_id', Auth::id())
+                ->where('user_status', 'instructor');
+            })->paginate(3);
+        }
 
         return view('admin.courses.index')->with('courses',$courses);
     }
@@ -33,6 +48,7 @@ class CourseController extends Controller
      */
     public function create()
     {
+        $this->authorize('create',Course::class);
         return view('admin.courses.create');
     }
 
@@ -44,6 +60,8 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create',Course::class);
+
         $this->checkRequest($request);
 
        /* $image_path = null;
@@ -62,22 +80,36 @@ class CourseController extends Controller
         $data['image'] = 'courses/'.$name; //pass converted img path after encoded
         //return dd($data);
 
-        $course = Course::create($data);
-        
-        $section = Section::create([
-            'name' => 'Introduction',
-            'course_id' => $course->id,
-        ]);
-        Lecture::create([
-            'name' => 'Introduction',
-            'video' => 'yourvideo.mp4',
-            'course_id' => $course->id,
-            'section_id' => $section->id,
-        ]);
+        DB::beginTransaction();
+        try {
+            $course = Course::create($data);
+            
+            $section = Section::create([
+                'name' => 'Introduction',
+                'course_id' => $course->id,
+            ]);
+            Lecture::create([
+                'name' => 'Introduction',
+                'video' => 'yourvideo.mp4',
+                'course_id' => $course->id,
+                'section_id' => $section->id,
+            ]);
+            
+            CourseUser::create([
+                'user_id' => Auth::id(),
+                'course_id' => $course->id,
+                'user_status' =>'instructor',
+            ]);
+            
+            DB::commit();
 
-        return Redirect::route('admin.courses.show',$course->id )
-        ->with('alert.success', "Course ({$course->title}) created!");
+            return Redirect::route('admin.courses.show',$course->id )
+            ->with('alert.success', "Course ({$course->title}) created!");
 
+        } catch (Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
     } 
 
     protected function checkRequest(Request $request)
@@ -100,9 +132,10 @@ class CourseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Course $course)
     {
-        $course = Course::where('id', '=' ,$id)->first();
+       // $course = Course::where('id', '=' ,$id)->first();
+       $this->authorize('view', $course);
         return view('admin.courses.show')->with('course',$course);
     }
 
@@ -124,9 +157,11 @@ class CourseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Course $course)
     {
-        $course = Course::findOrFail($id);
+        //$course = Course::findOrFail($id);
+        $this->authorize('update', $course);
+
         $this->checkRequest($request);
 
         $data = $request->except(['image','img64']); 
@@ -158,9 +193,10 @@ class CourseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Course $course)
     {
-       $course = Course::findOrFail($id);
+       //$course = Course::findOrFail($id);
+       $this->authorize('delete', $course);
        $course->delete();
         if ($course->image) {
             //unlink(public_path('images/' . $product->image));

@@ -19,48 +19,81 @@ $(document).ready(function () {
 
         if(allVals.length <=0)
         {
-            alert("Please select row.");
+            Swal.fire({
+                title: 'Select one row at least.',
+                showClass: {
+                  popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                  popup: 'animate__animated animate__fadeOutUp'
+                }
+              })
         }  else {
-            var check = confirm("Are you sure you want to delete this row?");
-            if(check == true){
-                var join_selected_values = allVals.join(",");
-                $.ajax({
-                    url: $(this).data('url'),
-                    type: 'DELETE',
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    data: 'ids='+join_selected_values+'&table='+$(this).data('table'),
-                    success: function (data) {
-                        if (data['success']) {
-                            $(".sub_chk:checked").each(function() {
-                                $(this).parents("tr").remove();
-                            });
-                            alert(data['success']);
-                        } else if (data['error']) {
-                            alert(data['error']);
-                        } else {
-                            alert('Whoops Something went wrong!!');
+            Swal.fire({
+                title: 'Are you sure you want to delete this rows?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+              }).then((result) => {
+                if (result.value) {
+                    var join_selected_values = allVals.join(",");
+                    $.ajax({
+                        url: $(this).data('url'),
+                        type: 'DELETE',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        data: 'ids='+join_selected_values+'&table='+$(this).data('table'),
+                        success: function (data) {
+                            if (data['success']) {
+                                $(".sub_chk:checked").each(function() {
+                                    $(this).parents("tr").remove();
+                                });
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Your rows has been deleted.',
+                                    'success'
+                                  )
+                            } else if (data['error']) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: data['error'],
+                                    footer: '<a href>Why do I have this issue?</a>'
+                                  })
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Something went wrong!',
+                                    footer: '<a href>Why do I have this issue?</a>'
+                                  })
+                            }
+                        },
+                        error: function (data) {
+                            alert(data.responseText);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: data.responseText,
+                                footer: '<a href>Why do I have this issue?</a>'
+                              })
                         }
-                    },
-                    error: function (data) {
-                        alert(data.responseText);
-                    }
-                });
-
-              $.each(allVals, function( index, value ) {
-                  $('table tr').filter("[data-row-id='" + value + "']").remove();
-              });
-            }
+                    });
+    
+                  $.each(allVals, function( index, value ) {
+                      $('table tr').filter("[data-row-id='" + value + "']").remove();
+                  });
+                }
+              })
+           
         }
     });
 // End bulk delete
 
 ///////////////////
 
-$( "#filter-btn" ).click(function(e) {
-    $( ".filter" ).slideToggle( "slow", function(){
-
-    });
-  });
 
   $( ".lecture" ).click(function(e) {
       var id = $(this).attr('id');
@@ -73,22 +106,41 @@ $( "#filter-btn" ).click(function(e) {
 
 $('.delete-course').on('click', function() {
 
-        var check = confirm("Are you sure you want to delete this row?");
-        if(check == true){
-           
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.value) {
             $.ajax({
                 url: $(this).data('url'),
                 type: 'DELETE',
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                 success: function (res) {
-                    window.location=res.url;
+                    Swal.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                      )
+                      window.location=res.url;
+
                 },
                 error: function (data) {
-                    alert(data.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: data.responseText,
+                        footer: '<a href>Why do I have this issue?</a>'
+                      })
                 }
             });
-
+          
         }
+      })
     
 });
 //////////////////

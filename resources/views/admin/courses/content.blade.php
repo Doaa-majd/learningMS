@@ -123,6 +123,8 @@
                 <label style="width: 300px" class="custom-file-label form-control" for="customFile">Choose video</label>
                 </div>
                 <input type="hidden" name="video64" id="video64" value="">
+                <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar"
+                aria-valuemin="0" aria-valuemax="100" style="width:0%">0%</div>
               </div>
         </div>
         <div class="modal-footer">
@@ -140,5 +142,6 @@
 
 @section('js')
 <script src="{{ asset('js/course.js') }}"></script>
+
 @endsection
 

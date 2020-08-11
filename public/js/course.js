@@ -1,5 +1,16 @@
 $(document).ready(function () {
 
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        onOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      })
     // To add new section 
     $(".add-section").click(function(e){
         var name = $(".section-name").val();
@@ -18,7 +29,7 @@ $(document).ready(function () {
                             $(".section-container").append(
                                 `<section class="section">
                                     <div class="action-section">
-                                    <a href="#" class="edit-section" data-name="`+ data.section.name +`" id="`+ data.section.id +`"><i class="far fa-edit"></i></a>
+                                    <a href="#" data-toggle="modal" data-target="#addsection" class="edit-section" data-name="`+ data.section.name +`" id="`+ data.section.id +`"><i class="far fa-edit"></i></a>
                                     <a href="#" class="delete-section" data-url="admin/sections/section/`+ data.section.id +`" id="`+ data.section.id +`"><i class="fas fa-times"></i></a>
                                     </div>
                                     <div class="section-title">
@@ -26,10 +37,20 @@ $(document).ready(function () {
                                     </div>
                                     <div class="add-lecture"><a href="#" data-toggle="modal" data-target="#addlecture" data-sid="`+ data.section.id +`" class="add-lecture-modal"><i class="fas fa-plus"></i> Lecture</a></div>
                                 </section>`);
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: 'Section added successfully'
+                                  })
                         },     
                            
                     }).fail(function (jqXHR, textStatus, error) {
-                        alert(jqXHR.responseText);
+                
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: jqXHR.responseText,
+                            footer: '<a href>Why do I have this issue?</a>'
+                          })
                     });
     		
 			
@@ -70,9 +91,18 @@ $(document).ready(function () {
             success: function() {
                 $('#addsection').modal('hide');
                 $('.section-title').find('h4').html(name);
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Section updated successfully'
+                  })
             },
         }).fail(function (jqXHR, textStatus, error) {
-            alert(jqXHR.responseText);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: jqXHR.responseText,
+                footer: '<a href>Why do I have this issue?</a>'
+              })
         });	
       
       
@@ -80,19 +110,34 @@ $(document).ready(function () {
 
 
     $(document).on( 'click','.delete-section', function() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+          }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: $(this).data('url'),
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    data: {},
+                    success: function() {
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'section deleted successfully'
+                            })
+                    },
+                });
+                $(this).parent().parent().fadeOut();     
+            }
+          })
 
-        $.ajax({
-                        type: 'DELETE',
-                        url: $(this).data('url'),
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        data: {},
-                        success: function() {
-                        
-                        },
-                    });
-                    $(this).parent().parent().fadeOut();     
     });  
-   ///////////////////////////// for Lectures
+   ///////////////////////////// for Lectures video convert to base64  
 
    function readURL(input) {
     if (input.files && input.files[0]) {
@@ -131,6 +176,7 @@ $(document).ready(function () {
       $(".edit-lecture").hide();
    });
 
+  
 
    $(document).on( 'click', '.store-lecture', function() {
     var name = $(".lecture-name").val();
@@ -139,6 +185,24 @@ $(document).ready(function () {
     var video64 = $("#video64").val();
 
         $.ajax({
+            
+  xhr: function() {
+    var xhr = new window.XMLHttpRequest();
+
+    xhr.upload.addEventListener("progress", function(evt) {
+      if (evt.lengthComputable) {
+        var percentComplete = evt.loaded / evt.total;
+        percentComplete = parseInt(percentComplete * 100);
+        $('.progress-bar').width(percentComplete+'%');
+        $('.progress-bar').html(percentComplete+'%');
+
+
+      }
+    }, false);
+
+    return xhr;
+  },
+
             type: 'POST',
             url: $(this).data('url'),
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -154,8 +218,9 @@ $(document).ready(function () {
                     `<div class="lecture" id="`+ data.lecture.id+`">
                 <div class="lecture-title-`+ data.lecture.id+`">`+ data.lecture.name+`
                     <div class="action-lecture">
-                        <a href="#" data-toggle="modal" data-target="#addlecture" data-sid="{{$section->id}}" data-lid="{{$lecture->id}}" data-name="{{$lecture->name}}" class="edit-lecture-modal"><i class="far fa-edit"></i></a>
-                        <a href="#"><i class="fas fa-times"></i></a>
+
+                        <a href="#" data-toggle="modal" data-target="#addlecture" data-sid="`+ section_id +`" data-lid="`+ data.lecture.id+`" data-name="`+ data.lecture.name+`" class="edit-lecture-modal"><i class="far fa-edit"></i></a>
+                        <a href="#" id="`+ section_id +`" data-url="http://localhost:8000/admin/lectures/lecture/`+ data.lecture.id +`" class="delete-lecture"><i class="fas fa-times"></i></a>
                     </div>
                 </div>
                 <div class="lecture-resourse-`+ data.lecture.id+` lecture-items mt-3">
@@ -167,9 +232,18 @@ $(document).ready(function () {
                     </div>
                 </div>
             </div>`);
+            Toast.fire({
+                icon: 'success',
+                title: 'Lecture added successfully'
+              })
             },
         }).fail(function (jqXHR, textStatus, error) {
-            alert(jqXHR.responseText);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: jqXHR.responseText,
+                footer: '<a href>Why do I have this issue?</a>'
+              })
         });	
 
 });
@@ -193,9 +267,18 @@ $(document).on( 'click', '.edit-lecture', function() {
             $('#addlecture').modal('hide');
             $('.lecture-title-'+data.lecture.id).html(data.lecture.name);
             $('.video-'+data.lecture.id).find('a').text(data.lecture.video);
+            Toast.fire({
+                icon: 'success',
+                title: 'Lecture updated successfully'
+              })
         },
     }).fail(function (jqXHR, textStatus, error) {
-        alert(jqXHR.responseText);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: jqXHR.responseText,
+            footer: '<a href>Why do I have this issue?</a>'
+          })
     });	
   
 });
@@ -203,16 +286,32 @@ $(document).on( 'click', '.edit-lecture', function() {
 
 $(document).on( 'click','.delete-lecture', function() {
 
-    $.ajax({
-        type: 'DELETE',
-        url: $(this).data('url'),
-        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-        data: {},
-        success: function() {
-        
-        },
-    });
-    $(this).parent().parent().parent().fadeOut();     
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.value) {
+            $.ajax({
+                type: 'DELETE',
+                url: $(this).data('url'),
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                data: {},
+                success: function() {
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Lecture deleted successfully'
+                      })
+                },
+            });
+            $(this).parent().parent().parent().fadeOut();     
+        }
+      })
+    
 });  
 
 

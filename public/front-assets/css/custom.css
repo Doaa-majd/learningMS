@@ -1,0 +1,47 @@
+.morecontent span {
+    display: none;
+}
+.morelink {
+    display: block;
+}
+.more-description{
+    padding-top: 40px;
+}
+.course-header{
+    background-color:#f6f5f7;
+    padding: 2px 20px 19px;
+}
+.c-section td{
+    padding-left: 30px !important;
+    font-weight: bold;
+    background-color: #f9f9f9;
+}
+.overview{
+    margin-left: 20px;
+}
+.course-lectures-right{
+    padding-left: 0px;
+}
+.lecture-complete{
+    margin-right: 10px !important;
+}
+.dropdown-menu .menu-link{
+    color: #363a47 !important;
+}
+.c-description{
+    padding: 0px !important;
+}
+.tab-content{
+    min-height: 200px;
+    margin-bottom: 40px;
+}
+.teacher-skills{
+    width: 50%;
+    padding-top: 20px;
+}
+.instuctor-profile{
+    padding: 15px 60px 60px;
+    width: 50%;
+    margin: 50px auto 50px;
+    background-color: #fff;
+}

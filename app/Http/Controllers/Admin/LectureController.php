@@ -36,7 +36,6 @@ class LectureController extends Controller
             
                 $videoData = base64_decode($videoData);
                 Storage::disk('videos')->put($name, $videoData);
-                //dd("stored");
             }
         }
         $data['video'] = $name;
